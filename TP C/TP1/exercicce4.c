@@ -4,7 +4,7 @@
 
 void printnBits (int n , int m)
 {
-      for(int i =n*8 ;i>=(n-1)*8;i--)
+      for(int i =n*8-1 ;i>=(n-1)*8;i--)
     {
        if((m>>i)&1==1)
         printf("1");
