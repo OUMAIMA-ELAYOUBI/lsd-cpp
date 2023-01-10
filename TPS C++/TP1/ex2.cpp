@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include<array>
 using namespace std;
 
 
@@ -21,22 +22,24 @@ typedef struct paths
 
 
 
-int ifexist(int x, vector<int> path)
+int ifexist(int x, vector<int> l)
 {
-    
-    if(path.empty()==true)
-            return 0;
+    int test=0;
+    if(l.empty()==true)
+            test=0;
     else
     {
-        for(int i =0 ;i<path.size();i++)
+        for(int i =0 ;i<l.size();i++)
         {
-            if(path[i]==x)
+            if(l.at(i)==x)
             {
+               // test=1;
+               // break;
                 return 1;
             }
         }
     }   
-  return 0;
+  return test;
 }
 
 int paths_empty(paths Q)
@@ -61,7 +64,6 @@ int len(paths Q)
 }
 
 
-
 void push(vector<int> l,paths * Q)
 {
     cellule * C=new cellule;
@@ -75,11 +77,12 @@ void push(vector<int> l,paths * Q)
     }
     else
     {
+  
         (*Q).end->next=C;
         (*Q).end=C;
     }
+    return;
 }
-
 
 
 void PRINT(vector<int> l)
@@ -121,25 +124,26 @@ void PRINTPATHS(paths Q)
 }
 
 
+const int n =6;
 
 
-vector<int> explore(vector<vector<int>>x , vector<int> path , int a)
+vector<int> explore(array<array<int,n> ,n> x, vector<int> path, int a)
 {
     vector<int> s;
     s.push_back(a);
     path.push_back(a);
+
     while (!s.empty())
     {
         int y = s.front();
         s.erase(s.begin());
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < n; i++)
         {
             if (x[y][i]==1 && !ifexist(i, path))
             {
-                 
                 s.push_back(i);
                 path.push_back(i);
-               
+           
             }
         }
     }
@@ -150,25 +154,38 @@ vector<int> explore(vector<vector<int>>x , vector<int> path , int a)
 
 
 
-paths allLinked (vector<vector<int>> x)
+paths allLinked ( array<array<int,n> ,n> x)
 {
-    paths  result={NULL,NULL};
+    paths  result= {NULL,NULL};
     vector<int> path;
-
-    // Iterate over all nodes in x
-    for (int i = 0; i < 6; i++)
+    vector<int> visited(n,0);
+    vector<int> v=explore( x, path, 0);
+    push(v,&result);
+     for(int i=0;i<v.size();i++)
+      {
+          int j=0;
+          j=v[i];
+          visited[j]=1;
+      }
+            v.clear();
+    
+    for (int i = 1; i < n; i++)
     {
-        path.push_back(i);
-        if (ifexist(i, path)==0)
-        {
-            vector<int> V=explore( x, path, i);
-            cout<<"V:"<<endl;
-            PRINT(V);
-            push(V,&result);
-            cout<<"result"<<endl;
-            PRINTPATHS(result);
-            path.clear();
+        // If node i has not been visited, explore all linked components from i
+        if (visited[i]==0)
+        { 
+           vector<int> v=explore( x, path, i);
+            push(v,&result);
+            for(int i=0;i<v.size();i++)
+            {
+                int j=0;
+                j=v[i];
+                visited[j]=1;
+            }
+            v.clear();
+
         }
+        
     }
     return result;
 
@@ -178,7 +195,13 @@ paths allLinked (vector<vector<int>> x)
 
 int main()
 {
-   vector<vector<int>> x{{0,1,1,0,0,0},{1,0,1,0,0,0},{1,1,0,0,0,0},{0,0,0,0,1,0},{0,0,0,1,0,0},{0,0,0,0,0,0}};
+array<array<int,n>,n> x = {{
+{0,1,1,0,0,0},
+{1,0,1,0,0,0},
+{1,1,0,0,0,0},
+{0,0,0,0,1,0},
+{0,0,0,1,0,0},
+{0,0,0,0,0,0}}};
   
     vector<int> l;
     paths Q = {NULL,NULL};
@@ -199,7 +222,7 @@ int main()
     
 
     PRINTPATHS(Q);
-    S= allLinked( x);
+    S= allLinked(x);
     cout<<"Linked components "<<endl;
     PRINTPATHS(S);
     
